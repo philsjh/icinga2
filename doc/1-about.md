@@ -46,39 +46,13 @@ Icinga 2 is available as [Vagrant Demo VM](#vagrant).
 
 ## <a id="whats-new"></a> What's new
 
-<<<<<<< HEAD
 ### What's New in Version 2.0.0 Beta 1
-=======
-### What's New in Version 0.0.10
-
-* Host and Service are now checkable. #5919
-* Support new lines in addition to commas to separate object attributes. #5901
-* Add group membership assign rules. #5910
-* Support nested groups. #5858
-* Add apply target type. #5924
-* Add relative object names. #5925
-* Merge macros and custom into 'vars' dictionary. Changed runtime macros and environment variable export. #5855
-* Add support for modified attributes for custom attributes. #5956
-* Allow to assign var values to existing vars evaluted on runtime. #5959
-* Rename/shorten attribute names and filter variables. #5857 
-* Remove the 'Icinga' prefix for global constants. #5960
-* Global option to enable/disable host/service checks. #5975
-* Add legacy attributes to host, service and group objects: `address{,6}'`, `notes`, `notes_url`, `action_url`, `icon_image`, `icon_image_alt`. #5856
-* Support "#" hash comments. #5994
-* Cluster: Spanning Tree like communication. #5467
-* Properly implement the Process class for Windows. #3684
->>>>>>> Fixes for poor grammar and bad sentence structure.
 
 Lots of things. Please read [Icinga 2 in a nutshell](#icinga2-in-a-nutshell).
 
 #### Changes
 
-<<<<<<< HEAD
 * Updated sample configuration for final release.
-=======
-* For a detailed list of changes check out [#5909](https://dev.icinga.org/issues/5909)
-* DB IDO schema upgrade required.
->>>>>>> Fixes for poor grammar and bad sentence structure.
 
 ### Archive
 
@@ -89,7 +63,7 @@ Please check the `ChangeLog` file.
 * Use [Packages](#getting-started)
 
 Look for available packages on [http://packages.icinga.org] or ask your distribution's maintainer.
-Compiling from source is not recommended, and not the default either.
+Compiling from source is not recommended.
 
 * Real Distributed Architecture
 
@@ -99,24 +73,22 @@ and High-Availability installations. Secured by SSL x509 certificates, supportin
 * High Performance
 
 Multithreaded and scalable for small embedded systems as well as large scale environments.
-Running checks every second - not an issue anymore.
+Running checks every second is no longer a problem.
 
 * Modular & flexible [features](#features)
 
-Enable only the features required for the local installation. Using Icinga Web 2 and requiring
-DB IDO, but no status data? No problem, just enable ido-mysql and disable statusdata.
-Another example: Graphite should be enabled on a dedicated cluster node. Enable it over there
-and point it to the carbon cache socket.
+Enable only the features you require. Want to use Icinga Web 2 with DB IDO but no status data?
+No problem! Just enable ido-mysql and disable statusdata. Another example: Graphite should be enabled 
+on a dedicated cluster node. Enable it over there and point it to the carbon cache socket.
 
 * Native support for the [Livestatus protocol](#setting-up-livestatus)
 
-Next to the Icinga 1.x status and log files and the IDO database backend the commonly used
-Livestatus protocol is available with Icinga 2. Either as unix or tcp socket.
+In Icinga2, the 'Livestatus' protocol is available for use as either a unix, or TCP socket.
 
 * Native support for [Graphite](#graphite-carbon-cache-writer)
 
 Icinga 2 still supports writing performance data files for graphing addons, but also adds the
-capability of writing performance data directly onto a Graphite tcp socket simplifying realtime
+capability of writing performance data directly into a Graphite tcp socket simplifying realtime
 monitoring graphs.
 
 * Dynamic configuration language
@@ -134,8 +106,8 @@ One command to rule them all - supporting optional and conditional [command argu
 [Environment variables](#command-environment-variables) exported on-demand populated with
 runtime evaluated macros.
 Three types of commands used for different actions: checks, notifications and events.
-Check timeout for commands instead of a global option. Command custom attributes allowing
-you to specify default values for the command.
+Check timeout for commands instead of a global option. Commands also have custom attributes allowing
+you to specify default values.
 
 * Custom Runtime Macros
 
@@ -148,9 +120,9 @@ the command line, environment variables and custom attribute assignments.
 
 Multiple [notifications](#notifications) for one host or service with existing users
 and notification commands. No more duplicated contacts for different notification types.
-Telling notification filters by state and type, even more fine-grained than Icinga 1.x.
+Telling notification filters by state and type, even more fine-tuned than Icinga 1.x.
 [Escalation notifications](#notification-escalations) and [delayed notifications](#first-notification-delay)
-are just notifications with additional begin and/or end time attribute.
+are just notifications with an additional begin and/or end time attribute.
 
 * Dependencies between Hosts and Services
 
@@ -162,8 +134,8 @@ required for network reachability calculations.
 
 * [Recurring Downtimes](#recurring-downtimes)
 
-Forget the external cronjob scheduling downtimes on-demand. Configure them right away as Icinga 2
-configuration objects and set their active time window.
+Forget using cronjobs to set up recurring downtime - you can configure them as Icinga2 configuration 
+objects and specify their active time window.
 
 * Embedded Health Checks
 
@@ -184,7 +156,7 @@ Additional information on the differences is documented in the [migration](#diff
 * [Vagrant Demo VM](#vagrant)
 
 Used for demo cases and development tests. Get Icinga 2 running within minutes and spread the #monitoringlove
-to your friends and partners.
+to your friends and colleagues.
 
 
 
