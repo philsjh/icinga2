@@ -17,7 +17,7 @@ For a more verbose output of the Icinga 2 daemon increase the
 ## <a id="troubleshooting-enable-debug-output"></a> Enable Debug Output
 
 Run Icinga 2 in the foreground with debugging enabled. Specify the console
-log severity as an additional parameter argument to `-x`. Default
+log severity as an additional parameter argument to `-x`. The default
 is `debug`.
 
     # /usr/sbin/icinga2 -c /etc/icinga2/icinga2.conf -x notice
@@ -30,11 +30,22 @@ Additionally you can enable the debug log using
 
 ## <a id="checks-not-executed"></a> Checks are not executed
 
+<<<<<<< HEAD
 * Check the debug log to see if the check command gets executed
 * Verify that failed depedencies do not prevent command execution
+=======
+* Check the debug log if the check command gets executed
+* Verify that failed dependencies do not prevent the command execution
+>>>>>>> 739c6d53a506df2837652771d857b30d5ad1248e
 * Make sure that the plugin is executable by the Icinga 2 user (run a manual test)
 
     # sudo -u icinga /usr/lib/nagios/plugins/check_ping -4 -H 127.0.0.1 -c 5000,100% -w 3000,80%
+
+* Make sure the [checker](#features) feature is enabled.
+
+    # icinga2-enable-feature checker
+    The feature 'checker' is already enabled.
+
 
 ## <a id="notifications-not-sent"></a> Notifications are not sent
 
@@ -49,7 +60,12 @@ Verify the following configuration
 * Do the user attributes `states`, `types`, `period` match the notification conditions?
 * Are there any notification `begin` and `end` times configured?
 
-* Does the referenced NotificationCommand work executed as Icinga user on the shell?
+* Make sure the [notification](#features) feature is enabled.
+
+    # icinga2-enable-feature notification
+    The feature 'notification' is already enabled.
+
+* Does the referenced NotificationCommand work when executed as Icinga user on the shell?
 
 ## <a id="feature-not-working"></a> Feature is not working
 
@@ -61,7 +77,7 @@ to `features-enabled` and that the latter is included in [icinga2.conf](#icinga2
 ## <a id="configuration-ignored"></a> Configuration is ignored
 
 * Make sure that the line(s) are not [commented](#comments) (starting with `//` or `#`, or
-encapsulated by `/* ... */`.
+encapsulated by `/* ... */`).
 * Is the configuration file included in [icinga2.conf](#icinga2-conf)?
 
 ## <a id="configuration-attribute-inheritance"></a> Configuration attributes are inherited from

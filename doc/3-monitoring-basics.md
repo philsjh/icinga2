@@ -10,8 +10,8 @@ and services can be virtually anything which can be checked in some way:
 
 * Network services (HTTP, SMTP, SNMP, SSH, etc.)
 * Printers
-* Switches / Routers
-* Temperature Sensors
+* Switches / routers
+* Temperature sensors
 * Other local or network-accessible services
 
 Host objects provide a mechanism to group services that are running
@@ -25,13 +25,13 @@ Here is an example of a host object which defines two child services:
     }
 
     object Service "ping4" {
-      host_name = "localhost"
+      host_name = "my-server1"
       check_command = "ping4"
     }
 
     object Service "http" {
-      host_name = "localhost"
-      check_command = "http_ip"
+      host_name = "my-server1"
+      check_command = "http"
     }
 
 The example creates two services `ping4` and `http` which belong to the
@@ -86,7 +86,7 @@ state the host/service switches to a `HARD` state and notifications are sent.
 
 The [Getting Started](#getting-started) chapter already introduced various aspects
 of the Icinga 2 configuration language. If you are ready to configure additional
-hosts, services, notifications, dependencies, etc you should think about the
+hosts, services, notifications, dependencies, etc, you should think about the
 requirements first and then decide for a possible strategy.
 
 There are many ways of creating Icinga 2 configuration objects:
@@ -275,7 +275,7 @@ the user groups are associated as attributes in `Notification` objects.
 
 #### <a id="group-assign"></a> Group Membership Assign
 
-If there is a certain number of hosts, services or users matching a pattern
+If there is a certain number of hosts, services, or users matching a pattern
 it's reasonable to assign the group object to these members.
 Details on the `assign where` syntax can be found [here](#apply)
 
@@ -294,7 +294,7 @@ monitoring setup.
 
 When a host or service is in a downtime, a problem has been acknowledged or
 the dependency logic determined that the host/service is unreachable, no
-notirications are sent. You can configure additional type and state filters
+notifications are sent. You can configure additional type and state filters
 refining the notifications being actually sent.
 
 There are many ways of sending notifications, e.g. by e-mail, XMPP,
@@ -321,6 +321,11 @@ object, notifications for all states and types will be sent.
 
 Details on troubleshooting notification problems can be found [here](#troubleshooting).
 
+> **Note**
+>
+> Make sure that the [notification](#features) feature is enabled on your master instance
+> in order to execute notification commands.
+
 You should choose which information you (and your notified users) are interested in
 case of emergency, and also which information does not provide any value to you and
 your environment.
@@ -338,7 +343,7 @@ to the defined notifications. That way you'll save duplicated attributes in each
 
       states = [ Warning, Critical, Unknown ]
       types = [ Problem, Acknowledgement, Recovery, Custom, FlappingStart,
-                FlappingEnd, DowntimeStart,DowntimeEnd, DowntimeRemoved ]
+                FlappingEnd, DowntimeStart, DowntimeEnd, DowntimeRemoved ]
 
       period = "24x7"
     }
@@ -362,7 +367,7 @@ send notifications to all group members.
 
 ### <a id="notification-escalations"></a> Notification Escalations
 
-When a problem notification is sent and a problem still exists after re-notification
+When a problem notification is sent and a problem still exists at the time of re-notification
 you may want to escalate the problem to the next support level. A different approach
 is to configure the default notification by email, and escalate the problem via sms
 if not already solved.
@@ -414,7 +419,7 @@ command) after `30m` until `1h`.
 > template or overriding the attribute directly in the `notifications` array
 > position for `escalation-sms-2nd-level`.
 
-If the problem does not get resolved or acknowledged preventing further notifications
+If the problem does not get resolved nor acknowledged preventing further notifications
 the `escalation-sms-1st-level` user will be escalated `1h` after the initial problem was
 notified, but only for one hour (`2h` as `end` key for the `times` dictionary).
 
@@ -457,8 +462,8 @@ notified, but only for one hour (`2h` as `end` key for the `times` dictionary).
 
 ### <a id="first-notification-delay"></a> First Notification Delay
 
-Sometimes the problem in question should not be notified when the first notification
-happens, but a defined time duration afterwards. In Icinga 2 you can use the `times`
+Sometimes the problem in question should not be notified when the notification is due
+(the object reaching the `HARD` state) but a defined time duration afterwards. In Icinga 2 you can use the `times`
 dictionary and set `begin = 15m` as key and value if you want to suppress notifications
 in the first 15 minutes. Leave out the `end` key - if not set, Icinga 2 will not check against any
 end time for this notification.
@@ -575,7 +580,7 @@ Use the `period` attribute to assign time periods to
 ## <a id="commands"></a> Commands
 
 Icinga 2 uses three different command object types to specify how
-checks should be performed, notifications should be sent and
+checks should be performed, notifications should be sent, and
 events should be handled.
 
 ### <a id="command-environment-variables"></a> Environment Variables for Commands
@@ -586,6 +591,11 @@ Please check [Runtime Custom Attributes as Environment Variables](#runtime-custo
 ### <a id="check-commands"></a> Check Commands
 
 `CheckCommand` objects define the command line how a check is called.
+
+> **Note**
+>
+> Make sure that the [checker](#features) feature is enabled in order to
+> execute checks.
 
 #### <a id="command-plugin-integration"></a> Integrate the Plugin with a CheckCommand Definition
 
@@ -783,6 +793,11 @@ interfaces (E-Mail, XMPP, IRC, Twitter, etc).
 
 `NotificationCommand` objects require the [ITL template](#itl-plugin-notification-command)
 `plugin-notification-command` to support native plugin-based notifications.
+
+> **Note**
+>
+> Make sure that the [notification](#features) feature is enabled on your master instance
+> in order to execute notification commands.
 
 Below is an example using runtime macros from Icinga 2 (such as `$service.output$` for
 the current check output) sending an email to the user(s) associated with the
@@ -983,10 +998,11 @@ exceeds the maintenance, you can manually cancel the downtime.
 Planned downtimes will also be taken into account for SLA reporting
 tools calculating the SLAs based on the state and downtime history.
 
-Downtimes may overlap with their start and end times. If there
-are multiple downtimes triggered for one object, the overall downtime depth
-will be more than `1`. This is useful when you want to extend
-your maintenance window taking longer than expected.
+Multiple downtimes for a single object may overlap. This is useful
+when you want to extend your maintenance window taking longer than expected.
+If there are multiple downtimes triggered for one object, the overall downtime depth
+will be greater than `1`.
+
 
 If the downtime was scheduled after the problem changed to a critical hard
 state triggering a problem notification, and the service recovers during
@@ -1005,10 +1021,9 @@ about a fixed downtime window between 23:00 and 24:00. After 24:00
 all problems should be alerted again. Solution is simple -
 schedule a `fixed` downtime starting at 23:00 and ending at 24:00.
 
-Unlike a `fixed` downtime, a `flexible` downtime end does not necessarily
-happen at the provided end time. Instead the downtime will be triggered
-by the state change in the time span defined by start and end time, but
-then last a defined duration in minutes.
+Unlike a `fixed` downtime, a `flexible` downtime will be triggered
+by the state change in the time span defined by start and end time,
+and then last for the specified duration in minutes.
 
 Imagine the following scenario: Your service is frequently polled
 by users trying to grab free deleted domains for immediate registration.
@@ -1464,11 +1479,11 @@ enable sending commands to Icinga 2 through your web interface:
     # usermod -G -a icingacmd www-data
 
 Debian packages use `nagios` as the default user and group name. Therefore change `icingacmd` to
-`nagios`.
+`nagios`. The webserver's user is different between distributions as well.
 
 ### <a id="external-command-list"></a> External Command List
 
-A list of currently supported external commands can be found [here](#external-commands-list-detail)
+A list of currently supported external commands can be found [here](#external-commands-list-detail).
 
 Detailed information on the commands and their required parameters can be found
 on the [Icinga 1.x documentation](http://docs.icinga.org/latest/en/extcommands2.html).
@@ -1587,7 +1602,6 @@ Icinga 1.x Classic UI requires this data set as part of its backend.
 > you can safely disable this feature.
 
 
-
 ## <a id="compat-logging"></a> Compat Logging
 
 The Icinga 1.x log format is considered being the `Compat Log`
@@ -1595,8 +1609,8 @@ in Icinga 2 provided with the `CompatLogger` object.
 
 These logs are not only used for informational representation in
 external web interfaces parsing the logs, but also to generate
-SLA reports and trends in Icinga 1.x Classic UI. Futhermore the
-`Livestatus` feature uses these logs for answering queries to
+SLA reports and trends in Icinga 1.x Classic UI. Furthermore the
+[Livestatus](#livestatus) feature uses these logs for answering queries to
 historical tables.
 
 The `CompatLogger` object can be enabled with
@@ -1636,6 +1650,211 @@ existing log parsers.
 
 
 
+
+## <a id="db-ido"></a> DB IDO
+
+The IDO (Icinga Data Output) modules for Icinga 2 take care of exporting all
+configuration and status information into a database. The IDO database is used
+by a number of projects including Icinga Web 1.x and 2.
+
+Details on the installation can be found in the [Getting Started](#configuring-ido)
+chapter. Details on the configuration can be found in the
+[IdoMysqlConnection](#objecttype-idomysqlconnection) and
+[IdoPgsqlConnection](#objecttype-idoPgsqlconnection)
+object configuration documentation.
+
+The following example query checks the health of the current Icinga 2 instance
+writing its current status to the DB IDO backend table `icinga_programstatus`
+every 10 seconds. By default it checks 60 seconds into the past which is a reasonable
+amount of time - adjust it for your requirements. If the condition is not met,
+the query returns an empty result.
+
+> **Tip**
+>
+> Use [check plugins](#plugins) to monitor the backend.
+
+Replace the `default` string with your instance name, if different.
+
+Example for MySQL:
+
+    # mysql -u root -p icinga -e "SELECT status_update_time FROM icinga_programstatus ps
+      JOIN icinga_instances i ON ps.instance_id=i.instance_id
+      WHERE (UNIX_TIMESTAMP(ps.status_update_time) > UNIX_TIMESTAMP(NOW())-60)
+      AND i.instance_name='default';"
+
+    +---------------------+
+    | status_update_time  |
+    +---------------------+
+    | 2014-05-29 14:29:56 |
+    +---------------------+
+
+
+Example for PostgreSQL:
+
+    # export PGPASSWORD=icinga; psql -U icinga -d icinga -c "SELECT ps.status_update_time FROM icinga_programstatus AS ps
+      JOIN icinga_instances AS i ON ps.instance_id=i.instance_id
+      WHERE ((SELECT extract(epoch from status_update_time) FROM icinga_programstatus) > (SELECT extract(epoch from now())-60))
+      AND i.instance_name='default'";
+
+    status_update_time   
+    ------------------------
+     2014-05-29 15:11:38+02
+    (1 Zeile)
+
+
+A detailed list on the available table attributes can be found in the [DB IDO Schema documentation](#schema-db-ido).
+
+
+## <a id="livestatus"></a> Livestatus
+
+The [MK Livestatus](http://mathias-kettner.de/checkmk_livestatus.html) project
+implements a query protocol that lets users query their Icinga instance for
+status information. It can also be used to send commands.
+
+Details on the installation can be found in the [Getting Started](#setting-up-livestatus)
+chapter.
+
+### <a id="livestatus-sockets"></a> Livestatus Sockets
+
+Other to the Icinga 1.x Addon, Icinga 2 supports two socket types
+
+* Unix socket (default)
+* TCP socket
+
+Details on the configuration can be found in the [LivestatusListener](#objecttype-livestatuslistener)
+object configuration.
+
+### <a id="livestatus-get-queries"></a> Livestatus GET Queries
+
+> **Note**
+>
+> All Livestatus queries require an additional empty line as query end identifier.
+> The `unixcat` tool is either available by the MK Livestatus project or as seperate
+> binary.
+
+There also is a Perl module available in CPAN for accessing the Livestatus socket
+programmatically: [Monitoring::Livestatus](http://search.cpan.org/~nierlein/Monitoring-Livestatus-0.74/)
+
+
+Example using the unix socket:
+
+    # echo -e "GET services\n" | unixcat /var/run/icinga2/cmd/livestatus
+
+Example using the tcp socket listening on port `6558`:
+
+    # echo -e 'GET services\n' | netcat 127.0.0.1 6558
+
+    # cat servicegroups <<EOF
+    GET servicegroups
+
+    EOF
+
+    (cat servicegroups; sleep 1) | netcat 127.0.0.1 6558
+
+
+### <a id="livestatus-command-queries"></a> Livestatus COMMAND Queries
+
+A list of available external commands and their parameters can be found [here](#external-commands-list-detail)
+
+    $ echo -e 'COMMAND <externalcommandstring>' | netcat 127.0.0.1 6558
+
+
+### <a id="livestatus-filters"></a> Livestatus Filters
+
+and, or, negate
+
+  Operator  | Negate   | Description
+  ----------|------------------------
+   =        | !=       | Equality
+   ~        | !~       | Regex match
+   =~       | !=~      | Equality ignoring case
+   ~~       | !~~      | Regex ignoring case
+   >        |          | Less than
+   <        |          | Greater than
+   >=       |          | Less than or equal
+   <=       |          | Greater than or equal
+
+
+### <a id="livestatus-stats"></a> Livestatus Stats
+
+Schema: "Stats: aggregatefunction aggregateattribute"
+
+  Aggregate Function | Description
+  -------------------|--------------
+  sum                | &nbsp;
+  min                | &nbsp;
+  max                | &nbsp;
+  avg                | sum / count
+  std                | standard deviation
+  suminv             | sum (1 / value)
+  avginv             | suminv / count
+  count              | ordinary default for any stats query if not aggregate function defined
+
+Example:
+
+    GET hosts
+    Filter: has_been_checked = 1
+    Filter: check_type = 0
+    Stats: sum execution_time
+    Stats: sum latency
+    Stats: sum percent_state_change
+    Stats: min execution_time
+    Stats: min latency
+    Stats: min percent_state_change
+    Stats: max execution_time
+    Stats: max latency
+    Stats: max percent_state_change
+    OutputFormat: json
+    ResponseHeader: fixed16
+
+### <a id="livestatus-output"></a> Livestatus Output
+
+* CSV
+
+CSV Output uses two levels of array separators: The members array separator
+is a comma (1st level) while extra info and host|service relation separator
+is a pipe (2nd level).
+
+Seperators can be set using ASCII codes like:
+
+    Separators: 10 59 44 124
+
+* JSON
+
+Default separators.
+
+### <a id="livestatus-error-codes"></a> Livestatus Error Codes
+
+  Code      | Description
+  ----------|--------------
+  200       | OK
+  404       | Table does not exist
+  452       | Exception on query
+
+### <a id="livestatus-tables"></a> Livestatus Tables
+
+  Table         | Join      |Description
+  --------------|-----------|----------------------------
+  hosts         | &nbsp;    | host config and status attributes, services counter
+  hostgroups    | &nbsp;    | hostgroup config, status attributes and host/service counters
+  services      | hosts     | service config and status attributes
+  servicegroups | &nbsp;    | servicegroup config, status attributes and service counters
+  contacts      | &nbsp;    | contact config and status attributes
+  contactgroups | &nbsp;    | contact config, members
+  commands      | &nbsp;    | command name and line
+  status        | &nbsp;    | programstatus, config and stats
+  comments      | services  | status attributes
+  downtimes     | services  | status attributes
+  timeperiods   | &nbsp;    | name and is inside flag
+  endpoints     | &nbsp;    | config and status attributes
+  log           | services, hosts, contacts, commands | parses [compatlog](#objecttype-compatlogger) and shows log attributes
+  statehist     | hosts, services | parses [compatlog](#objecttype-compatlogger) and aggregates state change attributes
+
+The `commands` table is populated with `CheckCommand`, `EventCommand` and `NotificationCommand` objects.
+
+A detailed list on the available table attributes can be found in the [Livestatus Schema documentation](#schema-livestatus).
+
+
 ## <a id="check-result-files"></a> Check Result Files
 
 Icinga 1.x writes its check result files into a temporary spool directory
@@ -1654,9 +1873,3 @@ on-demand in your Icinga 2 objects configuration.
     object CheckResultReader "reader" {
       spool_dir = "/data/check-results"
     }
-
-
-
-
-
-

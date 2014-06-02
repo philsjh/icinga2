@@ -9,13 +9,13 @@ if [ "$TOOL" != "icinga2-enable-feature" -a "$TOOL" != "icinga2-disable-feature"
 fi
 
 if [ -z "$1" ]; then
-	echo "Syntax: $0 <features separated with whitespaces>"
-	echo "    Example: $0 checker ido-mysql livestatus"
+	echo "Syntax: $TOOL <features separated with whitespaces>"
+	echo "  Example: $TOOL checker notification mainlog"
 
 	if [ "$TOOL" = "icinga2-enable-feature" ]; then
-		echo "Enables the specified feature."
+		echo "Enables the specified feature(s)."
 	else
-		echo "Disables the specified feature."
+		echo "Disables the specified feature(s)."
 	fi
 
 	echo
@@ -38,9 +38,6 @@ if [ -z "$1" ]; then
 fi
 
 FEATURES=$1
-
-# Get total params
-echo "Total params: $#"
 
 for FEATURES
 do

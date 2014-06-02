@@ -46,6 +46,25 @@ not yet available you will need to use the release tarball which you
 can download from the [Icinga website](https://www.icinga.org/). The
 release tarballs contain an `INSTALL` file with further instructions.
 
+### <a id="installation-enabled-features"></a> Enabled Features during Installation
+
+The default installation will enable three features required for a basic
+Icinga 2 installation:
+
+* `checker` for executing checks
+* `notification` for sending notifications
+* `mainlog` for writing the `icinga2.log ` file
+
+Verify that by calling `icinga2-enable-feature` without any additional parameters
+and enable the missing features, if any.
+
+    # icinga2-enable-feature
+    Syntax: icinga2-enable-feature <features separated with whitespaces>
+      Example: icinga2-enable-feature checker notification mainlog
+    Enables the specified feature(s).
+
+    Available features: api checker command compatlog debuglog graphite icingastatus ido-mysql ido-pgsql livestatus mainlog notification perfdata statusdata syslog
+    Enabled features: checker mainlog notification
 
 ### <a id="installation-paths"></a> Installation Paths
 
@@ -177,7 +196,7 @@ The `conf.d/localhost.conf` file contains our first host definition:
     }
 
 This defines the host `localhost`. The `import` keyword is used to import
-the `linux-server` template which takes care of setting up the host check
+the `generic-host` template which takes care of setting up the host check
 command.
 
 The `vars` attribute can be used to define custom attributes which are available
@@ -468,14 +487,13 @@ following command:
 
     # mysql -u root -p icinga < /usr/share/doc/icinga2-ido-mysql-*/schema/mysql.sql
 
-The Icinga 2 RPM packages install the schema files into
-`/usr/share/doc/icinga2-ido-mysql-*/schema` (`*` means package version).
+The schema file location differs by the distribution used:
 
-On SuSE-based distributions the schema files are installed in
-`/usr/share/doc/packages/icinga2-ido-mysql/schema`.
-
-The Debian/Ubuntu packages put the schema files into
-`/usr/share/icinga2-ido-mysql/schema`.
+  Distribution  | Schema Files
+  --------------|---------------------
+  RHEL          | `/usr/share/doc/icinga2-ido-mysql-*/schema` (`*` means package version).
+  SUSE          | `/usr/share/doc/packages/icinga2-ido-mysql/schema`
+  Debian/Ubuntu | `/usr/share/icinga2-ido-mysql/schema`
 
 #### <a id="upgrading-mysql-db"></a> Upgrading the MySQL database
 
@@ -530,6 +548,10 @@ setting up a PostgreSQL database for Icinga 2:
     # sudo -u postgres createdb -O icinga -E UTF8 icinga
     # sudo -u postgres createlang plpgsql icinga
 
+> **Note**
+>
+> Using PostgreSQL 9.x you can omit the `createlang` command.
+
 Locate your pg_hba.conf (Debian: `/etc/postgresql/*/main/pg_hba.conf`,
 RHEL/SUSE: `/var/lib/pgsql/data/pg_hba.conf`), add the icinga user with md5
 authentication method and restart the postgresql server.
@@ -557,14 +579,14 @@ using the following command:
     # export PGPASSWORD=icinga
     # psql -U icinga -d icinga < /usr/share/doc/icinga2-ido-pgsql-*/schema/pgsql.sql
 
-The Icinga 2 RPM packages install the schema files into
-`/usr/share/doc/icinga2-ido-pgsql-*/schema` (`*` means package version).
+The schema file location differs by the distribution used:
 
-On SuSE-based distributions the schema files are installed in
-`/usr/share/doc/packages/icinga2-ido-pgsql/schema`.
+  Distribution  | Schema Files
+  --------------|---------------------
+  RHEL          | `/usr/share/doc/icinga2-ido-pgsql-*/schema` (`*` means package version).
+  SUSE          | `/usr/share/doc/packages/icinga2-ido-pgsql/schema`
+  Debian/Ubuntu | `/usr/share/icinga2-ido-pgsql/schema`
 
-The Debian/Ubuntu packages put the schema files into
-`/usr/share/icinga2-ido-pgsql/schema`.
 
 #### <a id="upgrading-postgresql-db"></a> Upgrading the PostgreSQL database
 
@@ -755,6 +777,11 @@ to the default used in Icinga 2. Make sure to clear the cache afterwards.
                 </write>
 
     # icinga-web-clearcache
+
+> **Note**
+>
+> The path to the Icinga Web `clearcache` script may differ. Please check the
+> [Icinga Web documentation](https://docs.icinga.org) for details.
 
 Verify that your Icinga 1.x Web works by browsing to your Web installation URL:
 
